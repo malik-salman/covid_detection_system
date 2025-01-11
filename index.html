@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COVID-19 Prediction Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>COVID-19 Symptoms Prediction</h1>
+    <form id="predictionForm">
+        <label for="fever">Fever (°C):</label>
+        <input type="number" step="0.1" id="fever" name="Fever" required>
+
+        <label for="dryCough">Dry Cough (0/1):</label>
+        <input type="number" id="dryCough" name="Dry Cough" min="0" max="1" required>
+
+        <label for="chestPain">Chest Pain (0/1):</label>
+        <input type="number" id="chestPain" name="Chest Pain" min="0" max="1" required>
+
+        <label for="headache">Headache (0/1):</label>
+        <input type="number" id="headache" name="Headache" min="0" max="1" required>
+
+        <label for="fatigue">Fatigue (0/1):</label>
+        <input type="number" id="fatigue" name="Fatigue" min="0" max="1" required>
+
+        <label for="soreThroat">Sore Throat (0/1):</label>
+        <input type="number" id="soreThroat" name="Sore Throat" min="0" max="1" required>
+
+        <label for="lossTasteSmell">Loss of Taste/Smell (0/1):</label>
+        <input type="number" id="lossTasteSmell" name="Loss of Taste/Smell" min="0" max="1" required>
+
+        <label for="difficultyBreathing">Difficulty Breathing (0/1):</label>
+        <input type="number" id="difficultyBreathing" name="Difficulty Breathing" min="0" max="1" required>
+
+        <label for="diarrhea">Diarrhea (0/1):</label>
+        <input type="number" id="diarrhea" name="Diarrhea" min="0" max="1" required>
+
+        <label for="musclePain">Muscle Pain (0/1):</label>
+        <input type="number" id="musclePain" name="Muscle Pain" min="0" max="1" required>
+
+        <label for="travelHistory">Travel History (0/1):</label>
+        <input type="number" id="travelHistory" name="Travel History" min="0" max="1" required>
+
+        <label for="closeContact">Close Contact (0/1):</label>
+        <input type="number" id="closeContact" name="Close Contact" min="0" max="1" required>
+
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="Age" required>
+
+        <button type="button" id="submitButton">Predict</button>
+    </form>
+
+    <div class="result" id="result" style="display: none;"></div>
+
+    <script>
+        document.getElementById('submitButton').addEventListener('click', async () => {
+            const form = document.getElementById('predictionForm');
+            const formData = new FormData(form);
+            const data = {};
+
+            formData.forEach((value, key) => {
+                data[key] = parseFloat(value);
+            });
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+
+                const resultDiv = document.getElementById('result');
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<h3>Prediction Results:</h3>
+                    <p><strong>Naive Bayes Prediction:</strong> ${result["Naive Bayes Prediction"]}</p>
+                    <p><strong>SVM Prediction:</strong> ${result["SVM Prediction"]}</p>
+                    <p><strong>KNN Prediction:</strong> ${result["KNN Prediction"]}</p>
+                    <p><strong>Final Prediction:</strong> ${result["Final Prediction"] === 1 ? "COVID-19 Positive" : "COVID-19 Negative"}</p>`;
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
